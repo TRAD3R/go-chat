@@ -1,0 +1,7 @@
+port: 8585
+db:
+  host: "localhost"
+  port: "5432"
+  user: "trad3r"
+  name: "restapi_go"
+  sslmode: "disable"
