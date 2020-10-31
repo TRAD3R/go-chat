@@ -32,12 +32,13 @@ func (h Handler) Login(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.CreateUser(user); err != nil {
-		NewErrorResponse(c, http.StatusBadRequest, err.Error())
+	token, err := h.service.GenerateToken(user)
+	if err != nil {
+		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"token": user.Id,
+		"token": token,
 	})
 }

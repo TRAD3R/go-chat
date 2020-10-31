@@ -15,6 +15,7 @@ const (
 
 type Authorization interface {
 	CreateUser(user *models.User) error
+	GetUser(user *models.User) error
 }
 
 type List interface {

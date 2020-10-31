@@ -7,6 +7,7 @@ import (
 
 type Authorization interface {
 	CreateUser(user *models.User) error
+	GenerateToken(user *models.User) (string, error)
 }
 
 type List interface {
