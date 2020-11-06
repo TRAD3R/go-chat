@@ -1,21 +1,26 @@
 package models
 
 import (
-	"crypto/sha512"
-	"fmt"
+	"github.com/sirupsen/logrus"
+	"github/trad3r/go_temp.git/internal/helpers"
+	"time"
 )
 
-const salt = "KDFJnkseNLKEKgj9*9JKE#R"
-
 type User struct {
-	Id       int    `json:"id" db:"id"`
-	Name     string `json:"name" db:"name"`
-	Username string `json:"username" db:"username" binding:"required"`
-	Password string `json:"password" db:"password_hash" binding:"required"`
+	Id    int64
+	Name  string `json:"name"`
+	Image string `json:"image"`
 }
 
-func (u *User) HashPassword() {
-	hash := sha512.New()
-	hash.Write([]byte(u.Password))
-	u.Password = fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+func NewUser() *User {
+	avatar, err := helpers.GetRandomAvatar()
+	if err != nil {
+		logrus.Info(err)
+		avatar = "https://pickaface.net/gallery/avatar/unr_funny_170108_2338_7hs7qcl1.png"
+	}
+	return &User{
+		Id:    time.Now().Unix(),
+		Name:  helpers.GetRandomName(),
+		Image: avatar,
+	}
 }

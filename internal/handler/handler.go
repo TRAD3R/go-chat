@@ -2,26 +2,27 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github/trad3r/go_temp.git/internal/service"
+	"github/trad3r/go_temp.git/internal/ws"
 )
 
-type Handler struct {
-	service *service.Service
+type Hadler struct {
+	Hub *ws.Hub
 }
 
-func NewHandler(s *service.Service) *Handler {
-	return &Handler{
-		service: s,
+func NewHandler(hub *ws.Hub) *Hadler {
+	return &Hadler{
+		Hub: hub,
 	}
 }
 
-func (h Handler) InitRoutes() *gin.Engine {
-	router := gin.New()
-	auth := router.Group("/auth")
-	{
-		auth.POST("/log-in", h.Login)
-		auth.POST("/sign-up", h.Signin)
-	}
+func (h *Hadler) InitRoutes() *gin.Engine {
+	r := gin.Default()
 
-	return router
+	r.Static("/assets", "./public/assets")
+	r.LoadHTMLFiles("public/index.html")
+
+	r.GET("/", h.Main)
+	r.GET("/ws", h.WsHandle)
+
+	return r
 }
