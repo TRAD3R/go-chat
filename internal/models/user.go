@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"github/trad3r/go_temp.git/internal/helpers"
 	"time"
@@ -23,4 +24,8 @@ func NewUser() *User {
 		Name:  helpers.GetRandomName(),
 		Image: avatar,
 	}
+}
+
+func (u User) String() string {
+	return fmt.Sprintf("Id: %d, Name: %s", u.Id, u.Name)
 }

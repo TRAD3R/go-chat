@@ -1,6 +1,10 @@
 package ws
 
-import "github/trad3r/go_temp.git/internal/models"
+import (
+	"github.com/sirupsen/logrus"
+	"github/trad3r/go_temp.git/internal/models"
+	"os"
+)
 
 const (
 	OutputTypeNewUser        = "newUser"
@@ -9,6 +13,7 @@ const (
 )
 
 type Hub struct {
+	Logger     *logrus.Logger
 	Clients    map[*Client]bool
 	Broadcast  chan InputMessage
 	Register   chan *Client
@@ -41,8 +46,9 @@ func newOutputMessage(typeMessage string, currentUser *models.User, currentClien
 	}
 }
 
-func NewHub() *Hub {
+func NewHub(f *os.File) *Hub {
 	return &Hub{
+		Logger:     newLogger(f),
 		Clients:    make(map[*Client]bool),
 		Broadcast:  make(chan InputMessage),
 		Register:   make(chan *Client),
@@ -50,7 +56,15 @@ func NewHub() *Hub {
 	}
 }
 
+func newLogger(f *os.File) *logrus.Logger {
+	logger := logrus.New()
+	logger.SetOutput(f)
+
+	return logger
+}
+
 func (h Hub) Run() {
+	h.Logger.Info("Start hub")
 	for {
 		select {
 		case c := <-h.Register:
@@ -61,6 +75,7 @@ func (h Hub) Run() {
 					c.Send <- newOutputMessage(OutputTypeNewUser, client.User, false, nil)
 				}
 			}
+			h.Logger.Info("Register new client:", c.User)
 		case client := <-h.Unregister:
 			h.unregisterClient(client)
 			for client := range h.Clients {
@@ -82,5 +97,6 @@ func (h Hub) unregisterClient(client *Client) {
 	if _, ok := h.Clients[client]; ok {
 		delete(h.Clients, client)
 		close(client.Send)
+		h.Logger.Info("Unregister client:", client.User)
 	}
 }
